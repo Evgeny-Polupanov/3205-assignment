@@ -6,12 +6,25 @@ import type { Job } from './jobs.types';
 export class JobsService {
   private store: Job[] = [];
 
-  push(payload: Omit<Job, 'id'>) {
-    const job = {
-      ...payload,
+  push(payload: string[]): Job {
+    const job: Job = {
       id: randomUUID(),
+      urls: payload.map((url) => ({
+        url,
+        status: 'pending',
+        httpStatus: null,
+        errorMessage: null,
+        startTime: null,
+        endTime: null,
+        duration: null,
+      })),
+      createdAt: new Date(),
+      status: 'pending',
+      urlsCount: payload.length,
+      urlsStats: [0, 0],
     };
     this.store.push(job);
+    return job;
   }
 
   getJobs(): Omit<Job, 'urls'>[] {
@@ -34,13 +47,17 @@ export class JobsService {
     );
   }
 
-  delete(id: string) {
-    this.store = this.store.map((job) => {
-      const urls = job.urls.map((url) => ({
-        ...url,
-        status: url.status === 'pending' ? 'cancelled' : url.status,
-      }));
-      return job.id === id ? { ...job, urls, status: 'cancelled' } : job;
-    });
+  delete(id: string): Job | undefined {
+    const job = this.store.find((storedJob) => storedJob.id === id);
+    if (!job) {
+      return undefined;
+    }
+
+    job.urls = job.urls.map((url) => ({
+      ...url,
+      status: url.status === 'pending' ? 'cancelled' : url.status,
+    }));
+    job.status = 'cancelled';
+    return job;
   }
 }

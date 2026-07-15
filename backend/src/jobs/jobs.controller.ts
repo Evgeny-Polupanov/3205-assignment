@@ -1,4 +1,12 @@
-import { Controller, Delete, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import type { Job } from './jobs.types';
 
@@ -12,12 +20,25 @@ export class JobsController {
   }
 
   @Get(':id')
-  findOne(id: string): Job['urls'] | undefined {
-    return this.jobsService.getJobUrls(id);
+  findOne(@Param('id') id: string): Job['urls'] {
+    const urls = this.jobsService.getJobUrls(id);
+    if (!urls) {
+      throw new NotFoundException(`Job ${id} not found`);
+    }
+    return urls;
   }
 
   @Delete(':id')
-  remove(id: string) {
-    return this.jobsService.delete(id);
+  remove(@Param('id') id: string): Job {
+    const job = this.jobsService.delete(id);
+    if (!job) {
+      throw new NotFoundException(`Job ${id} not found`);
+    }
+    return job;
+  }
+
+  @Post()
+  create(@Body() body: { urls: string[] }) {
+    return this.jobsService.push(Array.from(new Set(body.urls)));
   }
 }
