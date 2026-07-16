@@ -1,20 +1,16 @@
-import './App.css';
-import { useGetJobsQuery } from './api';
+import Form from './components/form';
+import List from './components/list';
+import Detail from './components/detail';
 
 function App() {
-  const {
-    data: jobs = [],
-  } = useGetJobsQuery(undefined, {
-    pollingInterval: 4_000,
-    skipPollingIfUnfocused: true,
-  });
-
   return (
-    <ul>
-      {jobs.map((job) => (
-        <li key={job.id}>{job.status}</li>
-      ))}
-    </ul>
+    <main>
+      <section className="flex">
+        <Form />
+        <List />
+      </section>
+      <Detail />
+    </main>
   );
 }
 
