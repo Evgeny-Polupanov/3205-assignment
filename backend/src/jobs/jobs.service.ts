@@ -6,7 +6,7 @@ import type { Job } from './jobs.types';
 export class JobsService {
   private store: Job[] = [];
 
-  push(payload: string[]): Job {
+  push(payload: string[]): { jobId: string } {
     const job: Job = {
       id: randomUUID(),
       urls: payload.map((url) => ({
@@ -24,7 +24,7 @@ export class JobsService {
       urlsStats: [0, 0],
     };
     this.store.push(job);
-    return job;
+    return { jobId: job.id };
   }
 
   getJobs(): Omit<Job, 'urls'>[] {
@@ -47,17 +47,19 @@ export class JobsService {
     );
   }
 
-  delete(id: string): Job | undefined {
+  cancel(id: string): Job | undefined {
     const job = this.store.find((storedJob) => storedJob.id === id);
     if (!job) {
       return undefined;
     }
 
-    job.urls = job.urls.map((url) => ({
-      ...url,
-      status: url.status === 'pending' ? 'cancelled' : url.status,
-    }));
-    job.status = 'cancelled';
+    if (!['completed', 'cancelled', 'failed'].includes(job.status)) {
+      job.urls = job.urls.map((url) => ({
+        ...url,
+        status: url.status === 'pending' ? 'cancelled' : url.status,
+      }));
+      job.status = 'cancelled';
+    }
     return job;
   }
 }

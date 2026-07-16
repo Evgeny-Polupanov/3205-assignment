@@ -9,10 +9,14 @@ import {
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import type { Job } from './jobs.types';
+import { JobsProcessor } from './jobs.processor';
 
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly jobsService: JobsService,
+    private readonly jobsProcessor: JobsProcessor,
+  ) {}
 
   @Get()
   findAll(): Omit<Job, 'urls'>[] {
@@ -30,7 +34,9 @@ export class JobsController {
 
   @Delete(':id')
   remove(@Param('id') id: string): Job {
-    const job = this.jobsService.delete(id);
+    this.jobsProcessor.cancel(id);
+
+    const job = this.jobsService.cancel(id);
     if (!job) {
       throw new NotFoundException(`Job ${id} not found`);
     }
@@ -39,6 +45,12 @@ export class JobsController {
 
   @Post()
   create(@Body() body: { urls: string[] }) {
-    return this.jobsService.push(Array.from(new Set(body.urls)));
+    const job = this.jobsService.push(Array.from(new Set(body.urls)));
+
+    void this.jobsProcessor.process(job.jobId).catch(() => {
+      this.jobsService.edit(job.jobId, { status: 'failed' });
+    });
+
+    return job;
   }
 }
