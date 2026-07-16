@@ -36,7 +36,7 @@ export class JobsController {
   remove(@Param('id') id: string): Job {
     this.jobsProcessor.cancel(id);
 
-    const job = this.jobsService.delete(id);
+    const job = this.jobsService.cancel(id);
     if (!job) {
       throw new NotFoundException(`Job ${id} not found`);
     }

@@ -47,7 +47,7 @@ export class JobsService {
     );
   }
 
-  delete(id: string): Job | undefined {
+  cancel(id: string): Job | undefined {
     const job = this.store.find((storedJob) => storedJob.id === id);
     if (!job) {
       return undefined;

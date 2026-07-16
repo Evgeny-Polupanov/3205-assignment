@@ -8,6 +8,63 @@ export class JobsProcessor {
 
   constructor(private readonly jobsService: JobsService) {}
 
+  private randomDelay(maxMs = 10_000): number {
+    return Math.floor(Math.random() * (maxMs + 1));
+  }
+
+  private delay(ms: number, signal: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (signal.aborted) {
+        reject(signal.reason);
+        return;
+      }
+
+      const timeout = setTimeout(() => {
+        signal.removeEventListener('abort', onAbort);
+        resolve();
+      }, ms);
+
+      const onAbort = () => {
+        clearTimeout(timeout);
+        reject(signal.reason);
+      };
+
+      signal.addEventListener('abort', onAbort, {
+        once: true,
+      });
+    });
+  }
+
+  private async processUrls(
+    urls: JobURL[],
+    signal: AbortSignal,
+    concurrency = 5,
+  ): Promise<JobURL[]> {
+    const results = new Array<JobURL>(urls.length);
+    const pending = urls.entries();
+
+    const worker = async (): Promise<void> => {
+      while (!signal.aborted) {
+        const next = pending.next();
+
+        if (next.done) {
+          return;
+        }
+
+        const [index, item] = next.value;
+        results[index] = await this.checkUrl(item.url, signal);
+      }
+    }
+
+    const workerCount = Math.min(concurrency, urls.length);
+
+    await Promise.all(
+      Array.from({ length: workerCount }, () => worker()),
+    )
+
+    return results.filter(Boolean);
+  }
+
   async process(id: string): Promise<void> {
     const urls = this.jobsService.getJobUrls(id);
 
@@ -21,9 +78,11 @@ export class JobsProcessor {
     this.jobsService.edit(id, { status: 'in_progress' });
 
     try {
-      const results = await Promise.all(
-        urls.map(({ url }) => this.checkUrl(url, controller.signal)),
-      );
+      const results = await this.processUrls(urls, controller.signal);
+
+      if (controller.signal.aborted) {
+        return;
+      }
 
       const successful = results.filter(
         ({ status }) => status === 'success',
@@ -60,6 +119,8 @@ export class JobsProcessor {
     const startTime = new Date();
 
     try {
+      await this.delay(this.randomDelay(), cancellationSignal);
+
       let response = await fetch(url, {
         method: 'HEAD',
         redirect: 'follow',
