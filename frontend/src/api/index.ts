@@ -39,7 +39,7 @@ export const jobsApi = createApi({
         ]
         : [{ type: 'Jobs', id: 'LIST' }],
     }),
-    getJobUrls: builder.query<JobUrl[], string>({
+    getJob: builder.query<Pick<Job, 'urls' | 'status'>, string>({
       query: (id) => `/${id}`,
       providesTags: (_result, _error, id) => [{ type: 'Jobs', id }],
     }),
@@ -64,4 +64,4 @@ export const jobsApi = createApi({
   }),
 });
 
-export const { useGetJobsQuery, useGetJobUrlsQuery, useCreateJobMutation, useCancelJobMutation } = jobsApi;
+export const { useGetJobsQuery, useGetJobQuery, useCreateJobMutation, useCancelJobMutation } = jobsApi;
