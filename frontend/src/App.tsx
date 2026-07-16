@@ -1,8 +1,20 @@
 import './App.css';
+import { useGetJobsQuery } from './api';
 
 function App() {
+  const {
+    data: jobs = [],
+  } = useGetJobsQuery(undefined, {
+    pollingInterval: 4_000,
+    skipPollingIfUnfocused: true,
+  });
+
   return (
-    <section></section>
+    <ul>
+      {jobs.map((job) => (
+        <li key={job.id}>{job.status}</li>
+      ))}
+    </ul>
   );
 }
 
