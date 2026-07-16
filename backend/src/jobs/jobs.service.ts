@@ -53,11 +53,13 @@ export class JobsService {
       return undefined;
     }
 
-    job.urls = job.urls.map((url) => ({
-      ...url,
-      status: url.status === 'pending' ? 'cancelled' : url.status,
-    }));
-    job.status = 'cancelled';
+    if (!['completed', 'cancelled', 'failed'].includes(job.status)) {
+      job.urls = job.urls.map((url) => ({
+        ...url,
+        status: url.status === 'pending' ? 'cancelled' : url.status,
+      }));
+      job.status = 'cancelled';
+    }
     return job;
   }
 }
