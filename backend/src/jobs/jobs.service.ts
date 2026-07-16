@@ -6,7 +6,7 @@ import type { Job } from './jobs.types';
 export class JobsService {
   private store: Job[] = [];
 
-  push(payload: string[]): Job {
+  push(payload: string[]): { jobId: string } {
     const job: Job = {
       id: randomUUID(),
       urls: payload.map((url) => ({
@@ -24,7 +24,7 @@ export class JobsService {
       urlsStats: [0, 0],
     };
     this.store.push(job);
-    return job;
+    return { jobId: job.id };
   }
 
   getJobs(): Omit<Job, 'urls'>[] {
