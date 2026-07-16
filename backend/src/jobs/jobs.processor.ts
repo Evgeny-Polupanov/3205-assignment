@@ -66,7 +66,7 @@ export class JobsProcessor {
   }
 
   async process(id: string): Promise<void> {
-    const urls = this.jobsService.getJobUrls(id);
+    const urls = this.jobsService.getJob(id)?.urls;
 
     if (!urls) {
       return;

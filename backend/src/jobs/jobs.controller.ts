@@ -24,12 +24,12 @@ export class JobsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Job['urls'] {
-    const urls = this.jobsService.getJobUrls(id);
-    if (!urls) {
+  findOne(@Param('id') id: string): Pick<Job, 'urls' | 'status'> {
+    const jobData = this.jobsService.getJob(id);
+    if (!jobData) {
       throw new NotFoundException(`Job ${id} not found`);
     }
-    return urls;
+    return jobData;
   }
 
   @Delete(':id')
