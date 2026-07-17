@@ -10,12 +10,15 @@ export default function Form() {
 
   const onSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const urls = valueRef.current.value.split('\n').map((url) => url.trim()).filter(Boolean);
+    const textarea = valueRef.current;
+    if (!textarea) return;
+
+    const urls = textarea.value.split('\n').map((url) => url.trim()).filter(Boolean);
     const result = await createJob({ urls });
     if (result?.data?.jobId) {
       dispatch(setCurrentJobId(result.data.jobId));
     }
-    valueRef.current.value = '';
+    textarea.value = '';
   };
 
   return (

@@ -2,7 +2,6 @@ import { useCancelJobMutation, useGetJobQuery, useGetJobsQuery } from '../../api
 import { useEffect, useState } from 'react';
 import { statusMap } from '../list';
 import classNames from 'classnames';
-import { useAppDispatch } from '../../store/hooks.ts';
 
 const urlStatusMap = {
   pending: 'Pending',
