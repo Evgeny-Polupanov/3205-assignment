@@ -2,7 +2,6 @@ import { useCancelJobMutation, useGetJobQuery, useGetJobsQuery } from '../../api
 import { useEffect, useState } from 'react';
 import { statusMap } from '../list';
 import classNames from 'classnames';
-import { useAppDispatch } from '../../store/hooks.ts';
 
 const urlStatusMap = {
   pending: 'Pending',
@@ -26,7 +25,7 @@ export default function Detail({ id }: { id: string }) {
     pollingInterval,
   });
 
-  const query = useGetJobsQuery();
+  const getJobsQuery = useGetJobsQuery();
 
   const [cancelJob] = useCancelJobMutation();
 
@@ -35,7 +34,7 @@ export default function Detail({ id }: { id: string }) {
       setPollingInterval(POLLING_INTERVAL);
     } else {
       setPollingInterval(0);
-      query.refetch();
+      getJobsQuery.refetch();
     }
   }, [job, id]);
 
