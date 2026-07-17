@@ -1,14 +1,14 @@
-import type { Job, JobSummary } from '../../api';
+import type { JobSummary } from '../../api';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface State {
   jobs: JobSummary[];
-  currentJob: Pick<Job, 'urls' | 'status'> | null;
+  currentJobId: string | null;
 }
 
 const initialState: State = {
   jobs: [],
-  currentJob: null,
+  currentJobId: null,
 };
 
 const jobsSlice = createSlice({
@@ -18,8 +18,8 @@ const jobsSlice = createSlice({
     setJobs(state, action) {
       state.jobs = action.payload;
     },
-    setCurrentJob(state, action) {
-      state.currentJob = action.payload;
+    setCurrentJobId(state, action) {
+      state.currentJobId = action.payload;
     },
     resetJobs() {
       return initialState;
@@ -27,6 +27,6 @@ const jobsSlice = createSlice({
   },
 });
 
-export const { setJobs, setCurrentJob, resetJobs } = jobsSlice.actions;
+export const { setJobs, setCurrentJobId, resetJobs } = jobsSlice.actions;
 
 export default jobsSlice.reducer;

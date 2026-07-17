@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  BadRequestException,
   Param,
   Post,
 } from '@nestjs/common';
@@ -24,7 +25,7 @@ export class JobsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Pick<Job, 'urls' | 'status'> {
+  findOne(@Param('id') id: string): Job {
     const jobData = this.jobsService.getJob(id);
     if (!jobData) {
       throw new NotFoundException(`Job ${id} not found`);
@@ -45,7 +46,11 @@ export class JobsController {
 
   @Post()
   create(@Body() body: { urls: string[] }) {
-    const job = this.jobsService.push(Array.from(new Set(body.urls)));
+    const payload = Array.from(new Set(body.urls));
+    if (!payload.length) {
+      throw new BadRequestException('No URLs provided');
+    }
+    const job = this.jobsService.push(payload);
 
     void this.jobsProcessor.process(job.jobId).catch(() => {
       this.jobsService.edit(job.jobId, { status: 'failed' });
