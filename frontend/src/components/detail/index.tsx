@@ -37,13 +37,14 @@ export default function Detail({ id }: { id: string }) {
 
   const hasPending = job?.urls.some((url) => url.status === 'pending');
   const isProcessing = job?.urls.some((url) => url.status === 'in_progress');
+  const processedCount = job?.urls.filter((url) => TERMINAL_URL_STATUSES.has(url.status)).length;
 
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-bold">
-            Processed: {job?.urls.filter((url) => TERMINAL_URL_STATUSES.has(url.status)).length}/{job?.urlsCount}
+            Processed: {processedCount}/{job?.urlsCount}
           </h2>
           {job && (
             <>

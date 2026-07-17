@@ -1,7 +1,8 @@
 import { useGetJobsQuery } from '../../api';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { setCurrentJobId } from '../../store/reducers/jobs.ts';
+import { setCurrentJobId, setJobs } from '../../store/reducers/jobs.ts';
 import classNames from 'classnames';
+import { useEffect } from 'react';
 
 export const statusMap = {
   pending: 'Pending',
@@ -13,11 +14,19 @@ export const statusMap = {
 
 export default function List() {
   const {
-    data: jobs = [],
+    data: fetchedJobs,
+    isSuccess,
   } = useGetJobsQuery();
 
   const dispatch = useAppDispatch();
   const jobsSelector = useAppSelector((store) => store.jobs);
+  const jobs = jobsSelector?.jobs;
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(setJobs(fetchedJobs));
+    }
+  }, [isSuccess, fetchedJobs])
 
   return (
     <table className="w-full text-sm text-left text-gray-400 rounded-lg mb-4">
