@@ -1,5 +1,69 @@
+import { useGetJobsQuery } from '../../api';
+import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
+import { setCurrentJobId } from '../../store/reducers/jobs.ts';
+import classNames from 'classnames';
+
+const statusMap = {
+  pending: 'Pending',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
+};
+
 export default function List() {
+  const {
+    data: jobs = [],
+  } = useGetJobsQuery();
+
+  const dispatch = useAppDispatch();
+  const jobsSelector = useAppSelector((store) => store.jobs);
+
   return (
-    <ul className="flex-1/2"></ul>
+    <div className="flex-1/2">
+      <table className="w-full text-sm text-left text-gray-400 rounded-lg">
+        <thead className="text-xs uppercase bg-gray-700 text-gray-400">
+        <tr>
+          <th scope="col" className="px-6 py-3">
+            Job ID
+          </th>
+          <th scope="col" className="px-6 py-3">
+            Created at
+          </th>
+          <th scope="col" className="px-6 py-3">
+            Status
+          </th>
+          <th scope="col" className="px-6 py-3">
+            Success/Failure
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        {jobs.map((job) => (
+          <tr
+            key={job.id}
+            className={classNames("border-b border-gray-700 cursor-pointer", {
+              'bg-gray-500': jobsSelector.currentJobId === job.id,
+              'bg-gray-800': jobsSelector.currentJobId !== job.id,
+            })}
+            onClick={() => dispatch(setCurrentJobId(job.id))}
+          >
+            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+              {job.id}
+            </td>
+            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+              {(new Date(job.createdAt)).toLocaleString()}
+            </td>
+            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+              {statusMap[job.status]}
+            </td>
+            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+              {job.urlsStats[0]}/{job.urlsStats[1]}
+            </td>
+          </tr>
+        ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
