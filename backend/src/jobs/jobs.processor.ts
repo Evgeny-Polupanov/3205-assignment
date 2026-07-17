@@ -52,9 +52,10 @@ export class JobsProcessor {
         }
 
         const [index, item] = next.value;
+        item.status = 'in_progress';
         results[index] = await this.checkUrl(item.url, signal);
       }
-    }
+    };
 
     const workerCount = Math.min(concurrency, urls.length);
 

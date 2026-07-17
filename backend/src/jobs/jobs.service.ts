@@ -37,15 +37,8 @@ export class JobsService {
     }));
   }
 
-  getJob(id: string): Pick<Job, 'urls' | 'status'> | undefined {
-    const data = this.store.find((job) => job.id === id);
-    if (data) {
-      return {
-        urls: data.urls,
-        status: data.status,
-      };
-    }
-    return undefined;
+  getJob(id: string): Job | undefined {
+    return this.store.find((job) => job.id === id);
   }
 
   edit(id: string, payload: Partial<Job>) {

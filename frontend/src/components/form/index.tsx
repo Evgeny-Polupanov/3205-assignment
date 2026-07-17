@@ -27,7 +27,7 @@ export default function Form() {
       />
       {/*@ts-ignore*/}
       {error && <p className="text-red-500 text-left">{error?.data?.message ?? 'Unknown error'}</p>}
-      <button type="submit" className="block mt-4 bg-sky-500 hover:bg-sky-700 py-2 px-4 rounded-lg ml-auto text-white">
+      <button type="submit" className="block mt-4 bg-sky-500 hover:bg-sky-700 py-2 px-4 rounded-lg ml-auto text-white cursor-pointer">
         Add a job
       </button>
     </form>

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
 import { setCurrentJobId } from '../../store/reducers/jobs.ts';
 import classNames from 'classnames';
 
-const statusMap = {
+export const statusMap = {
   pending: 'Pending',
   in_progress: 'In Progress',
   completed: 'Completed',
@@ -20,50 +20,55 @@ export default function List() {
   const jobsSelector = useAppSelector((store) => store.jobs);
 
   return (
-    <div className="flex-1/2">
-      <table className="w-full text-sm text-left text-gray-400 rounded-lg">
-        <thead className="text-xs uppercase bg-gray-700 text-gray-400">
+    <table className="w-full text-sm text-left text-gray-400 rounded-lg mb-4">
+      <thead className="text-xs uppercase bg-gray-700 text-gray-400">
+      <tr>
+        <th scope="col" className="px-6 py-3">
+          Job ID
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Created at
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Status
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Success/Failure
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      {jobs.length === 0 && (
         <tr>
-          <th scope="col" className="px-6 py-3">
-            Job ID
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Created at
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Status
-          </th>
-          <th scope="col" className="px-6 py-3">
-            Success/Failure
-          </th>
+          <td colSpan={4} className="px-6 py-4 text-center">
+            No jobs found
+          </td>
         </tr>
-        </thead>
-        <tbody>
-        {jobs.map((job) => (
-          <tr
-            key={job.id}
-            className={classNames("border-b border-gray-700 cursor-pointer", {
-              'bg-gray-500': jobsSelector.currentJobId === job.id,
-              'bg-gray-800': jobsSelector.currentJobId !== job.id,
-            })}
-            onClick={() => dispatch(setCurrentJobId(job.id))}
-          >
-            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
-              {job.id}
-            </td>
-            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
-              {(new Date(job.createdAt)).toLocaleString()}
-            </td>
-            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
-              {statusMap[job.status]}
-            </td>
-            <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
-              {job.urlsStats[0]}/{job.urlsStats[1]}
-            </td>
-          </tr>
-        ))}
-        </tbody>
-      </table>
-    </div>
+      )}
+      {jobs.map((job) => (
+        <tr
+          key={job.id}
+          className={classNames("border-b border-gray-700 cursor-pointer", {
+            'bg-gray-500': jobsSelector.currentJobId === job.id,
+            'bg-gray-800': jobsSelector.currentJobId !== job.id,
+          })}
+          onClick={() => dispatch(setCurrentJobId(job.id))}
+        >
+          <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+            {job.id}
+          </td>
+          <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+            {(new Date(job.createdAt)).toLocaleString()}
+          </td>
+          <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+            {statusMap[job.status]}
+          </td>
+          <td scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">
+            {job.urlsStats[0]}/{job.urlsStats[1]}
+          </td>
+        </tr>
+      ))}
+      </tbody>
+    </table>
   );
 }

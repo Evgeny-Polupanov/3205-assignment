@@ -39,7 +39,7 @@ export const jobsApi = createApi({
         ]
         : [{ type: 'Jobs', id: 'LIST' }],
     }),
-    getJob: builder.query<Pick<Job, 'urls' | 'status'>, string>({
+    getJob: builder.query<Job, string>({
       query: (id) => `/${id}`,
       providesTags: (_result, _error, id) => [{ type: 'Jobs', id }],
     }),
